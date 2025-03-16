@@ -6,6 +6,8 @@ require('dotenv').config();
 const adminRoutes = require('./routes/adminRoutes');
 const clinicRoutes = require('./routes/clinicRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
+const patientRoutes = require('./routes/patientRoutes'); 
+const appointmentRoutes = require('./routes/adminRoutes');
 
 const app = express();
 app.use(cors());
@@ -13,7 +15,9 @@ app.use(bodyParser.json());
 
 app.use('/api/admin', adminRoutes); // ✅ Ensure this route is correct
 app.use('/api/clinic', clinicRoutes); // Use clinic routes
-app.use('/api/doctor', doctorRoutes); //Use Doctor routes
+app.use('/api/doctor', doctorRoutes); // Use Doctor routes
+app.use('/api/patients', patientRoutes);
+app.use('/api/appointments', appointmentRoutes);
 
 
 const PORT = process.env.PORT || 5000;
