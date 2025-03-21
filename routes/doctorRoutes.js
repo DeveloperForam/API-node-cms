@@ -10,22 +10,34 @@ router.post('/add', async (req, res) => {
     try {
         const { clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule } = req.body;
 
+        // Validate required fields
+        if (!clinic_id || !doctor_name || !email || !mobile_no || !specialization || !experience || !gender) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
         db.query('SELECT * FROM doctors WHERE email = ?', [email], async (err, results) => {
-            if (err) return res.status(500).json({ message: 'Database error' });
+            if (err) {
+                console.error("Database error:", err);
+                return res.status(500).json({ message: 'Database error' });
+            }
             if (results.length > 0) return res.status(400).json({ message: 'Doctor already exists' });
 
-            const scheduleJSON = JSON.stringify(schedule);
+            const scheduleJSON = JSON.stringify(schedule || []);
 
             db.query(
                 'INSERT INTO doctors (clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 [clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, scheduleJSON],
                 (err, result) => {
-                    if (err) return res.status(500).json({ message: 'Database error' });
+                    if (err) {
+                        console.error("Insert error:", err);
+                        return res.status(500).json({ message: 'Database error' });
+                    }
                     res.status(201).json({ message: 'Doctor added successfully' });
                 }
             );
         });
     } catch (error) {
+        console.error("Server error:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 });

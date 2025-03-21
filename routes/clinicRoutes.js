@@ -57,6 +57,9 @@ router.post('/login', async (req, res) => {
                 // Compare password
                 const isMatch = await bcrypt.compare(password, clinic.password);
                 if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+                
+                // if (isMatch) return res.status(400).json({ message: 'Login Successful' });
+                
 
                 // Generate token
                 const token = jwt.sign(
@@ -65,7 +68,7 @@ router.post('/login', async (req, res) => {
                     { expiresIn: '1h' }
                 );
 
-                res.json({ message: 'Login successful', token });
+                return res.status(200).json({ token , message:'Login Successful'});
             }
         );
     } catch (error) {
@@ -134,6 +137,17 @@ router.delete('/delete/:reference_id', async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
+
+// ✅ Clinic Logout
+router.post('/logout', async (req, res) => {
+    try {
+        // Clear the token on the client side (handled in frontend)
+        res.status(200).json({ message: 'Logout successful' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 
 
 module.exports = router;

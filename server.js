@@ -7,7 +7,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const clinicRoutes = require('./routes/clinicRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const patientRoutes = require('./routes/patientRoutes'); 
-const appointmentRoutes = require('./routes/adminRoutes');
+const appointmentRoutes = require('./routes/appointmentsRoutes');
 
 const app = express();
 app.use(cors());
