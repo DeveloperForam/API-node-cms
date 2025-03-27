@@ -86,6 +86,19 @@ router.get('/', (req, res) => {
     });
 });
 
+//count clinics
+router.get('/count', (req, res) => {
+    const sql = "SELECT COUNT(*) AS total_clinics FROM clinics";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error' });
+        }
+        res.json(results[0]); // Sending count as JSON response
+    });
+});
+
+
 // ✅ Update Clinic Details
 router.put('/update/:reference_id', async (req, res) => {
     try {

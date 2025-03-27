@@ -72,6 +72,19 @@ router.get("/list", (req, res) => {
     });
 });
 
+//count api
+router.get("/count", (req, res) => {
+    const sql = "SELECT COUNT(*) AS total_appointments FROM appointments";
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results[0]); // Sending the count as a response
+    });
+});
+
+
 //book slot
 router.get("/booked-slots", (req, res) => {
     const { doctor_id, date } = req.query;

@@ -142,6 +142,20 @@ router.get('/clinic-wise', (req, res) => {
     });
 });
 
+//count doctor
+router.get('/count', (req, res) => {
+    const query = "SELECT COUNT(*) AS total_doctors FROM doctors";
+
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database error', error: err });
+        }
+        res.json(results[0]); // Returns total count of doctors
+    });
+});
+
+
+
 
 
 module.exports = router;

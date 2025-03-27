@@ -120,6 +120,16 @@ router.get('/', async (req, res) => {
     }
 });
 
+//count patient
+router.get('/count', async (req, res) => {
+    try {
+        const [result] = await db.promise().query("SELECT COUNT(*) AS total_patients FROM patients");
+        res.json(result[0]); // Returns total count of patients
+    } catch (error) {
+        res.status(500).json({ message: "Database error", error: error.message });
+    }
+});
+
 // ✅ Fetch Single Patient by ID
 router.get('/:id', async (req, res) => {
     try {
