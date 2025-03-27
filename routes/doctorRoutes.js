@@ -8,10 +8,10 @@ const router = express.Router();
 // ✅ Add Doctor to a Clinic
 router.post('/add', async (req, res) => {
     try {
-        const { clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule } = req.body;
+        const { clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule, dob, address } = req.body;
 
         // Validate required fields
-        if (!clinic_id || !doctor_name || !email || !mobile_no || !specialization || !experience || !gender) {
+        if (!clinic_id || !doctor_name || !email || !mobile_no || !specialization || !experience || !gender || !dob || !address) {
             return res.status(400).json({ message: "All fields are required" });
         }
 
@@ -25,8 +25,8 @@ router.post('/add', async (req, res) => {
             const scheduleJSON = JSON.stringify(schedule || []);
 
             db.query(
-                'INSERT INTO doctors (clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-                [clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, scheduleJSON],
+                'INSERT INTO doctors (clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, schedule, dob, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [clinic_id, doctor_name, email, mobile_no, specialization, experience, gender, scheduleJSON, dob, address],
                 (err, result) => {
                     if (err) {
                         console.error("Insert error:", err);
@@ -45,12 +45,12 @@ router.post('/add', async (req, res) => {
 // ✅ Update Doctor
 router.put('/update/:doctor_id', async (req, res) => {
     try {
-        const { doctor_name, email, mobile_no, specialization, experience, gender, schedule } = req.body;
+        const { doctor_name, email, mobile_no, specialization, experience, gender, schedule, dob, address } = req.body;
         const scheduleJSON = JSON.stringify(schedule);
 
         db.query(
-            'UPDATE doctors SET doctor_name=?, email=?, mobile_no=?, specialization=?, experience=?, gender=?, schedule=? WHERE id=?',
-            [doctor_name, email, mobile_no, specialization, experience, gender, scheduleJSON, req.params.doctor_id],
+            'UPDATE doctors SET doctor_name=?, email=?, mobile_no=?, specialization=?, experience=?, gender=?, schedule=?, dob=?, address=? WHERE id=?',
+            [doctor_name, email, mobile_no, specialization, experience, gender, scheduleJSON, dob, address, req.params.doctor_id],
             (err, result) => {
                 if (err) return res.status(500).json({ message: 'Database error' });
                 res.json({ message: 'Doctor updated successfully' });
@@ -126,7 +126,9 @@ router.get('/clinic-wise', (req, res) => {
             d.mobile_no, 
             d.specialization, 
             d.experience, 
-            d.gender 
+            d.gender, 
+            d.dob,
+            d.address
         FROM clinics c
         LEFT JOIN doctors d ON c.id = d.clinic_id
         ORDER BY c.id, d.id;
@@ -135,31 +137,8 @@ router.get('/clinic-wise', (req, res) => {
     db.query(query, (err, results) => {
         if (err) return res.status(500).json({ message: 'Database error', error: err });
 
-        const clinicDoctors = {};
-
-        results.forEach(row => {
-            if (!clinicDoctors[row.clinic_id]) {
-                clinicDoctors[row.clinic_id] = {
-                    clinic_id: row.clinic_id,
-                    clinic_name: row.clinic_name,
-                    doctors: []
-                };
-            }
-
-            if (row.doctor_id) {
-                clinicDoctors[row.clinic_id].doctors.push({
-                    doctor_id: row.doctor_id,
-                    doctor_name: row.doctor_name,
-                    email: row.email,
-                    mobile_no: row.mobile_no,
-                    specialization: row.specialization,
-                    experience: row.experience,
-                    gender: row.gender
-                });
-            }
-        });
-
-        res.json(Object.values(clinicDoctors));
+        // Return results directly instead of grouping by clinic
+        res.json(results);
     });
 });
 

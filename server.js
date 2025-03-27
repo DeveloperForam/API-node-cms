@@ -8,16 +8,18 @@ const clinicRoutes = require('./routes/clinicRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
 const patientRoutes = require('./routes/patientRoutes'); 
 const appointmentRoutes = require('./routes/appointmentsRoutes');
+const scheduleRoutes = require("./routes/scheduleRoutes");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/api/admin', adminRoutes); // ✅ Ensure this route is correct
-app.use('/api/clinic', clinicRoutes); // Use clinic routes
-app.use('/api/doctor', doctorRoutes); // Use Doctor routes
+app.use('/api/admin', adminRoutes); 
+app.use('/api/clinic', clinicRoutes); 
+app.use('/api/doctor', doctorRoutes); 
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
+app.use("/api/schedules", scheduleRoutes);
 
 
 const PORT = process.env.PORT || 5000;

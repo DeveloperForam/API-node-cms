@@ -57,9 +57,6 @@ router.post('/login', async (req, res) => {
                 // Compare password
                 const isMatch = await bcrypt.compare(password, clinic.password);
                 if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-                
-                // if (isMatch) return res.status(400).json({ message: 'Login Successful' });
-                
 
                 // Generate token
                 const token = jwt.sign(
@@ -68,7 +65,12 @@ router.post('/login', async (req, res) => {
                     { expiresIn: '1h' }
                 );
 
-                return res.status(200).json({ token , message:'Login Successful'});
+                // Store token in database
+                db.query('UPDATE clinics SET token = ? WHERE id = ?', [token, clinic.id], (updateErr) => {
+                    if (updateErr) return res.status(500).json({ message: 'Error storing token' });
+
+                    return res.status(200).json({ token, message: 'Login Successful' });
+                });
             }
         );
     } catch (error) {
@@ -78,7 +80,7 @@ router.post('/login', async (req, res) => {
 
 // ✅ Fetch Clinic List
 router.get('/', (req, res) => {
-    db.query('SELECT clinic_name, mobile_no, address, email, reference_id FROM clinics', (err, results) => {
+    db.query('SELECT id ,clinic_name, mobile_no, address, email, reference_id FROM clinics', (err, results) => {
         if (err) return res.status(500).json({ message: 'Database error' });
         res.json(results);
     });
@@ -146,6 +148,21 @@ router.post('/logout', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
+});
+
+// ✅ Fetch Patients Clinic Wise
+router.get('/patients/:reference_id', (req, res) => {
+    const { reference_id } = req.params;
+    
+    db.query(
+        'SELECT * FROM patients WHERE clinic_reference_id = ?', 
+        [reference_id], 
+        (err, results) => {
+            if (err) return res.status(500).json({ message: 'Database error' });
+            if (results.length === 0) return res.status(404).json({ message: 'No patients found for this clinic' });
+            res.json(results);
+        }
+    );
 });
 
 
